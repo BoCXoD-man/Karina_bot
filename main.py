@@ -1,5 +1,4 @@
 import os
-TOKEN = os.getenv("BOT_TOKEN")
 
 import telebot
 from telebot.types import Message, ReplyKeyboardMarkup as RKM, KeyboardButton as KB
@@ -35,7 +34,17 @@ def handle_commands(mes: Message):
     /info  - выведет информацию о разработчике.
     """
     text = """Бот разработан Манаевой Кариной
-    Почта: sowa_sidit_na_vetke@mail.ru"""
+    Почта: sowa_sidit_na_vetke@mail.ru
+"""
+    bot.send_message(mes.chat.id, text)
+
+@bot.message_handler(commands=['log'])
+def handle_commands(mes: Message):
+    """
+    Обработчик команд:
+    /info  - выведет информацию о разработчике.
+    """
+    text = """Вышла новая версия"""
     bot.send_message(mes.chat.id, text)
 
 

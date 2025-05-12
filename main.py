@@ -32,7 +32,7 @@ clear_kb = Rkr() # Удаление  клавиатуры
 @bot.message_handler(commands=['menu', 'start'])
 def handle_commands(mes: Message):
     if mes.chat.id != int(id_admin): 
-        bot.send_message(mes.chat.id,f"{mes.chat.id}, {id_admin}"+"Доступ запрещен")
+        bot.send_message(mes.chat.id,"Доступ запрещен")
         return
     """
     Обработчик команд:

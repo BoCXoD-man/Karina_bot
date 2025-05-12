@@ -146,19 +146,39 @@ def place_limit_order_with_risk_control(side, entry_price, stop_loss, take_profi
     try:
         symbol = coin.upper() + "USDT"
 
+        # Получаем информацию о символе (в т.ч. шаг объема qty_step)
+        info = bybit.get_instruments_info(
+            category="linear",
+            symbol=symbol
+        )
+        symbol_info = info.get("result", {}).get("list", [{}])[0]
+        qty_step = float(symbol_info.get("lotSizeFilter", {}).get("qtyStep", 0.001))
+
+        if not qty_step:
+            return f"Не удалось получить qtyStep для {symbol}."
+
+        # Расчёт объёма позиции по риску
         price_diff = abs(entry_price - stop_loss)
         if price_diff == 0:
             return "Ошибка: цена входа и стоп-лосс совпадают."
 
-        quantity = round(risk_usd / price_diff, 6)
+        raw_qty = risk_usd / price_diff
+        # Округляем вниз до ближайшего шага (qty_step)
+        precision = abs(str(qty_step).find('.') - len(str(qty_step))) if '.' in str(qty_step) else 0
+        rounded_qty = (int(raw_qty / qty_step)) * qty_step
+        rounded_qty = round(rounded_qty, precision)
 
+        if rounded_qty == 0:
+            return f"Рассчитанное количество ({raw_qty}) слишком мало для торговли {symbol}."
+
+        # Создание лимитного ордера
         order = bybit.place_order(
             category="linear",
             symbol=symbol,
             side="Buy" if side == "buy" else "Sell",
             order_type="Limit",
             price=entry_price,
-            qty=quantity,
+            qty=rounded_qty,
             time_in_force="GoodTillCancel",
             reduce_only=False,
             close_on_trigger=False

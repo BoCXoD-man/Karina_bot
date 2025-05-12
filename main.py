@@ -183,6 +183,7 @@ def place_limit_order_with_risk_control(side, entry_price, stop_loss, take_profi
             price=entry_price,
             qty=rounded_qty,
             time_in_force="GTC",
+            position_idx=1 if side == "buy" else 2,
             reduce_only=False,
             close_on_trigger=False
         )

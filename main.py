@@ -24,7 +24,7 @@ bybit = HTTP(
 
 
 # Блок создания бота
-bot = telebot.TeleBot(TOKEN)
+bot = telebot.TeleBot(TOKEN) 
 clear_kb = Rkr() # Удаление  клавиатуры
 
 

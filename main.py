@@ -19,7 +19,7 @@ BYBIT_API_SECRET = os.getenv("BYBIT_API_SECRET")
 bybit = HTTP(
     api_key=BYBIT_API_KEY,
     api_secret=BYBIT_API_SECRET,
-    testnet=True  # False — для реального рынка
+    testnet=False  # False — для реального рынка
 )
 
 

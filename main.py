@@ -184,7 +184,7 @@ def place_limit_order_with_risk_control(
             price=entry_price,
             qty=rounded_qty,
             time_in_force="GTC",
-            position_idx=position_idx,
+            position_idx = 1 if side.lower() == "buy" else 2,
             reduce_only=False,
             close_on_trigger=False
         )
@@ -199,7 +199,7 @@ def place_limit_order_with_risk_control(
             symbol=symbol,
             stop_loss=str(stop_loss),
             take_profit=str(take_profit),
-            position_idx=position_idx
+            position_idx = 1 if side.lower() == "buy" else 2,
         )
 
         return (

@@ -61,9 +61,9 @@ def handle_commands(mes: Message):
 
 @bot.message_handler(commands=['log'])
 def handle_commands(mes: Message):
-    if mes.chat.id != id_admin:
-        bot.send_message(mes.chat.id, "Доступ запрещен")
-        return
+    # if mes.chat.id != id_admin:
+    #     bot.send_message(mes.chat.id, "Доступ запрещен")
+    #     return
     """
     Обработчик команд:
     /info  - выведет информацию о разработчике.
@@ -73,6 +73,9 @@ def handle_commands(mes: Message):
 
 @bot.message_handler(commands=['calc'])
 def handle_calc(message: Message):
+    # if message.chat.id != id_admin:
+    #     bot.send_message(message.chat.id, "Доступ запрещен")
+    #     return
     try:
         # Пример: /calc buy 1.2345 1.2000
         args = message.text.split()[1:]
@@ -92,6 +95,9 @@ def handle_calc(message: Message):
 # Обработчик /b: /b buy eth 3000 2900 3300
 @bot.message_handler(commands=["b"])
 def handle_order(message: Message):
+    # if message.chat.id != id_admin:
+    #     bot.send_message(message.chat.id, "Доступ запрещен")
+    #     return
     try:
         args = message.text.split()[1:]
         if len(args) != 5:

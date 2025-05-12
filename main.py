@@ -171,6 +171,9 @@ def place_limit_order_with_risk_control(side, entry_price, stop_loss, take_profi
         if rounded_qty == 0:
             return f"Рассчитанное количество ({raw_qty}) слишком мало для торговли {symbol}."
 
+# Определение position_idx (1 — long, 2 — short)
+        position_idx = 1 if side.lower() == "buy" else 2
+
         # Создание лимитного ордера
         order = bybit.place_order(
             category="linear",

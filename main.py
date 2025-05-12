@@ -179,7 +179,7 @@ def place_limit_order_with_risk_control(side, entry_price, stop_loss, take_profi
             order_type="Limit",
             price=entry_price,
             qty=rounded_qty,
-            time_in_force="GoodTillCancel",
+            time_in_force="GTC",
             reduce_only=False,
             close_on_trigger=False
         )

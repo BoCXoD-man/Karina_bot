@@ -141,49 +141,50 @@ def calculate_position(side: str, entry_price: float, stop_loss: float, max_loss
     except Exception as e:
         return f"Ошибка в расчётах: {e}"
         
-def place_limit_order_with_risk_control(side, entry_price, stop_loss, take_profit,
-                                        coin: str, risk_usd=5.0):
+def place_limit_order_with_risk_control(
+    side: str,
+    entry_price: float,
+    stop_loss: float,
+    take_profit: float,
+    coin: str,
+    risk_usd: float = 5.0
+) -> str:
     try:
         symbol = coin.upper() + "USDT"
 
-        # Получаем информацию о символе (в т.ч. шаг объема qty_step)
-        info = bybit.get_instruments_info(
-            category="linear",
-            symbol=symbol
-        )
+        # Получаем шаг количества
+        info = bybit.get_instruments_info(category="linear", symbol=symbol)
         symbol_info = info.get("result", {}).get("list", [{}])[0]
         qty_step = float(symbol_info.get("lotSizeFilter", {}).get("qtyStep", 0.001))
 
         if not qty_step:
-            return f"Не удалось получить qtyStep для {symbol}."
+            return f"Не удалось получить шаг объема (qtyStep) для {symbol}."
 
-        # Расчёт объёма позиции по риску
+        # Расчёт объема позиции
         price_diff = abs(entry_price - stop_loss)
         if price_diff == 0:
             return "Ошибка: цена входа и стоп-лосс совпадают."
 
         raw_qty = risk_usd / price_diff
-        # Округляем вниз до ближайшего шага (qty_step)
-        precision = abs(str(qty_step).find('.') - len(str(qty_step))) if '.' in str(qty_step) else 0
-        rounded_qty = (int(raw_qty / qty_step)) * qty_step
-        rounded_qty = round(rounded_qty, precision)
+        precision = str(qty_step)[::-1].find('.')  # Кол-во знаков после точки
+        rounded_qty = round((int(raw_qty / qty_step) * qty_step), precision)
 
         if rounded_qty == 0:
-            return f"Рассчитанное количество ({raw_qty}) слишком мало для торговли {symbol}."
+            return f"Объём ({raw_qty}) слишком мал для торговли {symbol}."
 
-# Определение position_idx (1 — long, 2 — short)
+        # Определяем направление позиции
         position_idx = 1 if side.lower() == "buy" else 2
 
-        # Создание лимитного ордера
+        # Размещение лимитного ордера
         order = bybit.place_order(
             category="linear",
             symbol=symbol,
-            side="Buy" if side == "buy" else "Sell",
+            side="Buy" if side.lower() == "buy" else "Sell",
             order_type="Limit",
             price=entry_price,
             qty=rounded_qty,
             time_in_force="GTC",
-            position_idx=1 if side == "buy" else 2,
+            position_idx=position_idx,
             reduce_only=False,
             close_on_trigger=False
         )
@@ -192,21 +193,23 @@ def place_limit_order_with_risk_control(side, entry_price, stop_loss, take_profi
         if not order_id:
             return f"Не удалось создать ордер: {order}"
 
-        # Установка SL/TP
+        # Установка стоп-лосса и тейк-профита
         bybit.set_trading_stop(
             category="linear",
             symbol=symbol,
             stop_loss=str(stop_loss),
             take_profit=str(take_profit),
-            position_idx=0
+            position_idx=position_idx
         )
 
-        return (f"✅ Ордер создан по {symbol}:\n"
-                f"{side.upper()} @ {entry_price}\n"
-                f"Объём: {quantity}\n"
-                f"SL: {stop_loss}, TP: {take_profit}")
+        return (
+            f"✅ Ордер создан по {symbol}:\n"
+            f"{side.upper()} @ {entry_price}\n"
+            f"Объём: {rounded_qty}\n"
+            f"SL: {stop_loss}, TP: {take_profit}"
+        )
+
     except Exception as e:
         return f"Ошибка: {e}"
-        
 if __name__ == '__main__':
     bot.polling()

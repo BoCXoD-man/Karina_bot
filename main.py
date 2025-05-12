@@ -4,7 +4,12 @@ import telebot
 from telebot.types import Message, ReplyKeyboardMarkup as RKM, KeyboardButton as KB
 from telebot.types import InlineKeyboardMarkup as IKM, InlineKeyboardButton as IB
 from telebot.types import ReplyKeyboardRemove as Rkr
+
 from pybit.unified_trading import HTTP
+
+# Для локальных тестов
+# from config import TOKEN, id_admin, BYBIT_API_KEY, BYBIT_API_SECRET
+
 
 TOKEN = os.getenv("BOT_TOKEN")
 id_admin = os.getenv("bot_admin")
@@ -67,7 +72,7 @@ def handle_commands(mes: Message):
     bot.send_message(mes.chat.id, text)
 
 @bot.message_handler(commands=['calc'])
-def handle_calc(message):
+def handle_calc(message: Message):
     try:
         # Пример: /calc buy 1.2345 1.2000
         args = message.text.split()[1:]
@@ -86,7 +91,7 @@ def handle_calc(message):
 
 # Обработчик /b: /b buy eth 3000 2900 3300
 @bot.message_handler(commands=["b"])
-def handle_order(message):
+def handle_order(message: Message):
     try:
         args = message.text.split()[1:]
         if len(args) != 5:

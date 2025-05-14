@@ -111,7 +111,7 @@ def handle_order(message: Message):
         stop_loss = float(args[3])
         take_profit = float(args[4])
 
-        result = place_limit_order_with_risk_control(
+        result = place_limit_order_with_tp_sl(
             side, entry_price, stop_loss, take_profit, coin
         )
         bot.reply_to(message, result)

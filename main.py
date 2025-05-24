@@ -161,7 +161,12 @@ def tracking_loop(coin: str, chat_id: int):
                 bot.send_message(chat_id, f"{symbol}: позиция закрыта.")
                 active_trackers.pop(coin, None)
                 break
-            entry_price = float(position["entryPrice"])
+            entry_price_raw = position.get("entryPrice")
+            if not entry_price_raw:
+                bot.send_message(chat_id, f"{symbol}: entryPrice отсутствует или нулевой.")
+                active_trackers.pop(coin, None)
+                break
+            entry_price = float(entry_price_raw)
             take_profit = float(position["takeProfit"]) if position["takeProfit"] else None
             if not take_profit:
                 bot.send_message(chat_id, f"{symbol}: TP не установлен.")
